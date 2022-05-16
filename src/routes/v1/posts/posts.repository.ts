@@ -1,90 +1,45 @@
-import { Types, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 
-import SignUpDto from '@v1/auth/dto/sign-up.dto';
 import { PaginationParamsInterface } from '@interfaces/pagination-params.interface';
-import { PaginatedPostsInterface, PaginatedUsersInterface } from '@interfaces/paginatedEntity.interface';
+import { PaginatedPostsInterface } from '@interfaces/paginatedEntity.interface';
 
 import PaginationUtils from '@utils/pagination.utils';
-import { Post, PostDocument } from '@v1/posts/schemas/posts.schema';
+import { Post } from '@v1/posts/schemas/posts.schema';
 import { UpdatePostDto } from '@v1/posts/dto/update-post.dto';
+import { DeleteResult, ObjectId } from 'mongodb';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export default class PostsRepository {
-  constructor(@InjectModel(Post.name) private postsModel: Model<PostDocument>) {}
+  constructor(@InjectModel(Post.name) private postsModel: Model<Post>) {}
 
-  public async create(user: SignUpDto): Promise<Post> {
-    const newUser = await this.postsModel.create({
-      ...user,
-      verified: false,
+  public async create(post: CreatePostDto): Promise<Post> {
+    const newPost = await this.postsModel.create({
+      ...post,
     });
 
-    return newUser.toObject();
+    return newPost.toObject();
   }
 
-  public async getByEmail(email: string): Promise<Post | null> {
+  public async getById(id: ObjectId): Promise<Post | null> {
     return this.postsModel
       .findOne({
-        email,
+        _id: id,
       })
       .lean();
   }
 
-  public async getVerifiedUserByEmail(email: string): Promise<Post | null> {
+  public async getOneBySlug(slug: string): Promise<Post | null> {
     return this.postsModel
       .findOne({
-        email,
-        verified: true,
+        slug,
       })
       .lean();
   }
 
-  public async getUnverifiedUserByEmail(email: string): Promise<Post | null> {
-    return this.postsModel
-      .findOne({
-        email,
-        verified: false,
-      })
-      .lean();
-  }
-
-  public async getById(id: Types.ObjectId): Promise<Post | null> {
-    return this.postsModel
-      .findOne(
-        {
-          _id: id,
-        },
-        { password: 0 },
-      )
-      .lean();
-  }
-
-  public async getVerifiedUserById(id: Types.ObjectId): Promise<Post | null> {
-    return this.postsModel
-      .findOne(
-        {
-          _id: id,
-          verified: true,
-        },
-        { password: 0 },
-      )
-      .lean();
-  }
-
-  public async getUnverifiedUserById(id: Types.ObjectId): Promise<Post | null> {
-    return this.postsModel
-      .findOne(
-        {
-          _id: id,
-          verified: false,
-        },
-        { password: 0 },
-      )
-      .lean();
-  }
-
-  public async updateById(id: Types.ObjectId, data: UpdatePostDto): Promise<Post | null> {
+  public async updateById(id: ObjectId, data: UpdatePostDto): Promise<Post | null> {
     return this.postsModel
       .findByIdAndUpdate(id, {
         $set: data,
@@ -92,26 +47,37 @@ export default class PostsRepository {
       .lean();
   }
 
-  public async getAllVerifiedWithPagination(
+  public async deleteById(id: ObjectId): Promise<DeleteResult> {
+    return this.postsModel.deleteOne({ _id: id });
+  }
+
+  public async getPostsWithPagination(
     options: PaginationParamsInterface,
   ): Promise<PaginatedPostsInterface> {
-    const verified = true;
-    const [users, totalCount] = await Promise.all([
+    const [posts, totalCount] = await Promise.all([
       this.postsModel
-        .find(
-          {
-            verified,
-          },
-          {
-            password: 0,
-          },
-        )
+        .find({})
         .limit(PaginationUtils.getLimitCount(options.limit))
         .skip(PaginationUtils.getSkipCount(options.page, options.limit))
         .lean(),
-      this.postsModel.count({ verified }).lean(),
+      this.postsModel.count().lean(),
     ]);
 
-    return { paginatedResult: users, totalCount };
+    return { paginatedResult: posts, totalCount };
+  }
+
+  public async getShortPostsWithPagination(
+    options: PaginationParamsInterface,
+  ): Promise<PaginatedPostsInterface> {
+    const [shortPosts, totalCount] = await Promise.all([
+      this.postsModel
+        .find({}, { title: 1, slug: 1, excerpt: 1, date: 1, coverImage: 1, published_at: 1 })
+        .limit(PaginationUtils.getLimitCount(options.limit))
+        .skip(PaginationUtils.getSkipCount(options.page, options.limit))
+        .lean(),
+      this.postsModel.count().lean(),
+    ]);
+
+    return { paginatedResult: shortPosts, totalCount };
   }
 }

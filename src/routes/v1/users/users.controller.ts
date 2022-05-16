@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import {
   BadRequestException,
   Controller,
@@ -28,7 +28,7 @@ import UserResponseEntity from '@v1/users/entity/user-response.entity';
 import Serialize from '@decorators/serialization.decorator';
 import { User } from './schemas/users.schema';
 import UsersService from './users.service';
-import PaginationUtils from '../../../utils/pagination.utils';
+import PaginationUtils, { PaginationRequestParams } from '../../../utils/pagination.utils';
 import ResponseUtils from '../../../utils/response.utils';
 
 @ApiTags('Users')
@@ -66,7 +66,7 @@ export default class UsersController {
   @Get(':id')
   @Serialize(UserResponseEntity)
   @UseGuards(JwtAccessGuard)
-  async getById(@Param('id', ParseObjectIdPipe) id: Types.ObjectId): Promise<UserResponseEntity> {
+  async getById(@Param('id', ParseObjectIdPipe) id: ObjectId): Promise<UserResponseEntity> {
     const foundUser = await this.usersService.getVerifiedUserById(id);
 
     if (!foundUser) {
@@ -99,10 +99,9 @@ export default class UsersController {
   @Get()
   @Serialize(UserResponseEntity)
   @UseGuards(JwtAccessGuard)
-  async getAllVerifiedUsers(@Query() query: any): Promise<UserResponseEntity> {
-    const paginationParams: PaginationParamsInterface | false = PaginationUtils.normalizeParams(
-      query.page,
-    );
+  async getAllVerifiedUsers(@Query() query: PaginationRequestParams): Promise<UserResponseEntity> {
+    const paginationParams: PaginationParamsInterface | false =
+      PaginationUtils.normalizeParams(query);
     if (!paginationParams) {
       throw new BadRequestException('Invalid pagination parameters');
     }

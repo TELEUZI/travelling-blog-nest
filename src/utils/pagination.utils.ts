@@ -1,6 +1,12 @@
 import { PaginationParamsInterface } from '@interfaces/pagination-params.interface';
 import commonConstants from '../constants/common.constants';
 
+export interface PaginationRequestParams {
+  page?: string;
+  limit?: string;
+  size?: string;
+}
+
 class PaginationUtils {
   private static buildLink(location: string, paginationParams?: PaginationParamsInterface): string {
     if (!process.env.SERVER_HOST) {
@@ -39,17 +45,13 @@ class PaginationUtils {
     return false;
   }
 
-  public normalizeParams(params: {
-    number?: string;
-    limit?: string;
-    size?: string;
-  }): PaginationParamsInterface | false {
+  public normalizeParams(params?: PaginationRequestParams): PaginationParamsInterface | false {
     const ret: { page: number; limit?: number } = { page: 1 };
     if (!params) {
       return ret;
     }
 
-    const page = PaginationUtils.normalizeParam(params.number);
+    const page = PaginationUtils.normalizeParam(params.page);
     if (page) {
       ret.page = page;
     }

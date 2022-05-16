@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ObjectId } from 'mongodb';
+import { GridFSBucketReadStream } from 'mongodb';
 
-export class Post {
+export class ShortPost {
   @ApiProperty({ type: String })
   slug = '';
 
@@ -12,14 +12,11 @@ export class Post {
   date: string = new Date().toISOString();
 
   @ApiProperty({ type: String })
-  author = '';
-
-  @ApiProperty({ type: String })
   excerpt = '';
 
-  @ApiProperty({ type: String })
-  content = '';
+  @ApiProperty({ type: GridFSBucketReadStream })
+  coverImage: GridFSBucketReadStream = new GridFSBucketReadStream();
 
-  @ApiProperty({ type: ObjectId })
-  coverImage: ObjectId = new ObjectId();
+  @ApiProperty({ type: String })
+  author = '';
 }

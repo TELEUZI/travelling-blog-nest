@@ -1,16 +1,19 @@
-import { Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { RolesEnum } from '@decorators/roles.decorator';
+import { ObjectId } from 'mongodb';
 
 export default class UsersEntity {
   @ApiProperty({ type: String })
-  _id: Types.ObjectId = new Types.ObjectId();
+  _id: ObjectId = new ObjectId();
 
   @ApiProperty({ type: 'enum', enum: RolesEnum })
   role: RolesEnum = RolesEnum.USER;
 
   @ApiProperty({ type: Boolean })
-  verified = false;
+  verified = true;
+
+  @ApiProperty({ type: String })
+  username = 'Anon';
 
   @ApiProperty({ type: String })
   email = '';

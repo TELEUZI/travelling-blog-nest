@@ -1,7 +1,7 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Serializer } from 'jsonapi-serializer';
+import { Serializer, SerializerOptions } from 'jsonapi-serializer';
 import * as _ from 'lodash';
 import PaginationUtils from '../utils/pagination.utils';
 
@@ -10,9 +10,10 @@ export default class WrapResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((...args) => {
-        const serializeOptions: any = {};
+        const serializeOptions: SerializerOptions = {};
+        serializeOptions.keyForAttribute = 'camelCase';
         const { data, options, collectionName } = args[0];
-
+        console.log(data);
         if (data && collectionName) {
           if (data.length) {
             serializeOptions.attributes = Object.keys(_.omit(data[0], ['_id', 'id']));
@@ -33,7 +34,6 @@ export default class WrapResponseInterceptor implements NestInterceptor {
             });
             serializeOptions.meta = { totalCount: options.totalCount };
           }
-
           return new Serializer(collectionName, serializeOptions).serialize(data);
         }
 

@@ -1,7 +1,9 @@
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
 export interface DecodedUser {
-  readonly _id: Types.ObjectId;
+  readonly _id: ObjectId;
+
+  readonly username: string;
 
   readonly email: string;
 

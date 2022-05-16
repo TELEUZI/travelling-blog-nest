@@ -1,23 +1,24 @@
-import { Types, Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 
 import SignUpDto from '@v1/auth/dto/sign-up.dto';
 import { PaginationParamsInterface } from '@interfaces/pagination-params.interface';
 import { PaginatedUsersInterface } from '@interfaces/paginatedEntity.interface';
-import { UserDocument, User } from '@v1/users/schemas/users.schema';
+import { User } from '@v1/users/schemas/users.schema';
 
 import PaginationUtils from '@utils/pagination.utils';
+import { ObjectId } from 'mongodb';
 import UpdateUserDto from './dto/update-user.dto';
 
 @Injectable()
 export default class UsersRepository {
-  constructor(@InjectModel(User.name) private usersModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private usersModel: Model<User>) {}
 
   public async create(user: SignUpDto): Promise<User> {
     const newUser = await this.usersModel.create({
       ...user,
-      verified: false,
+      verified: true,
     });
 
     return newUser.toObject();
@@ -49,7 +50,7 @@ export default class UsersRepository {
       .lean();
   }
 
-  public async getById(id: Types.ObjectId): Promise<User | null> {
+  public async getById(id: ObjectId): Promise<User | null> {
     return this.usersModel
       .findOne(
         {
@@ -60,7 +61,7 @@ export default class UsersRepository {
       .lean();
   }
 
-  public async getVerifiedUserById(id: Types.ObjectId): Promise<User | null> {
+  public async getVerifiedUserById(id: ObjectId): Promise<User | null> {
     return this.usersModel
       .findOne(
         {
@@ -72,7 +73,7 @@ export default class UsersRepository {
       .lean();
   }
 
-  public async getUnverifiedUserById(id: Types.ObjectId): Promise<User | null> {
+  public async getUnverifiedUserById(id: ObjectId): Promise<User | null> {
     return this.usersModel
       .findOne(
         {
@@ -84,7 +85,7 @@ export default class UsersRepository {
       .lean();
   }
 
-  public async updateById(id: Types.ObjectId, data: UpdateUserDto): Promise<User | null> {
+  public async updateById(id: ObjectId, data: UpdateUserDto): Promise<User | null> {
     return this.usersModel
       .findByIdAndUpdate(id, {
         $set: data,

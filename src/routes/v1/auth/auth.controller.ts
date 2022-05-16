@@ -33,10 +33,9 @@ import { Request as ExpressRequest } from 'express';
 
 import UsersService from '@v1/users/users.service';
 import JwtAccessGuard from '@guards/jwt-access.guard';
-import RolesGuard from '@guards/roles.guard';
+
 import { User } from '@v1/users/schemas/users.schema';
 import AuthBearer from '@decorators/auth-bearer.decorator';
-import { Roles, RolesEnum } from '@decorators/roles.decorator';
 import WrapResponseInterceptor from '@interceptors/wrap-response.interceptor';
 import UserResponseEntity from '@v1/users/entity/user-response.entity';
 import Serialize from '@decorators/serialization.decorator';
@@ -221,6 +220,7 @@ export default class AuthController {
       _id: decodedUser._id,
       email: decodedUser.email,
       role: decodedUser.role,
+      username: decodedUser.username,
     };
 
     return ResponseUtils.success('tokens', await this.authService.login(payload));
@@ -251,8 +251,8 @@ export default class AuthController {
   })
   @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(RolesGuard)
-  @Roles(RolesEnum.ADMIN)
+  // @UseGuards(RolesGuard)
+  // @Roles(RolesEnum.ADMIN)
   @Put('verify')
   async verifyUser(
     @Body() verifyUserDto: VerifyUserDto,
@@ -297,7 +297,7 @@ export default class AuthController {
   @UseGuards(JwtAccessGuard)
   @Delete('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@AuthBearer() token: string): Promise<{} | never> {
+  async logout(@AuthBearer() token: string): Promise<Record<string, never> | never> {
     const decodedUser: DecodedUser | null = await this.authService.verifyToken(
       token,
       authConstants.jwt.secrets.accessToken,
@@ -331,10 +331,10 @@ export default class AuthController {
   })
   @ApiBearerAuth()
   @Delete('logout-all')
-  @UseGuards(RolesGuard)
-  @Roles(RolesEnum.ADMIN)
+  // @UseGuards(RolesGuard)
+  // @Roles(RolesEnum.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logoutAll(): Promise<{}> {
+  async logoutAll(): Promise<string> {
     return this.authService.deleteAllTokens();
   }
 

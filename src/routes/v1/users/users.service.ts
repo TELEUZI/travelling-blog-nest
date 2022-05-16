@@ -1,12 +1,12 @@
 import * as bcrypt from 'bcrypt';
 
-import { Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import SignUpDto from '@v1/auth/dto/sign-up.dto';
 import { PaginationParamsInterface } from '@interfaces/pagination-params.interface';
 import { PaginatedUsersInterface } from '@interfaces/paginatedEntity.interface';
 
 import { User } from '@v1/users/schemas/users.schema';
+import { ObjectId } from 'mongodb';
 import UsersRepository from './users.repository';
 import UpdateUserDto from './dto/update-user.dto';
 
@@ -20,33 +20,27 @@ export default class UsersService {
     return this.usersRepository.create({
       password: hashedPassword,
       email: user.email,
+      username: user.username,
     });
   }
 
-  public getVerifiedUserByEmail(
-    email: string
-  ): Promise<User | null> {
+  public getVerifiedUserByEmail(email: string): Promise<User | null> {
     return this.usersRepository.getVerifiedUserByEmail(email);
   }
 
-  public getVerifiedUserById(id: Types.ObjectId): Promise<User | null> {
+  public getVerifiedUserById(id: ObjectId): Promise<User | null> {
     return this.usersRepository.getVerifiedUserById(id);
   }
 
-  public getUnverifiedUserByEmail(
-    email: string
-  ): Promise<User | null> {
+  public getUnverifiedUserByEmail(email: string): Promise<User | null> {
     return this.usersRepository.getUnverifiedUserByEmail(email);
   }
 
-  public getUnverifiedUserById(id: Types.ObjectId): Promise<User | null> {
+  public getUnverifiedUserById(id: ObjectId): Promise<User | null> {
     return this.usersRepository.getUnverifiedUserById(id);
   }
 
-  public update(
-    id: Types.ObjectId,
-    data: UpdateUserDto,
-  ): Promise<User | null> {
+  public update(id: ObjectId, data: UpdateUserDto): Promise<User | null> {
     return this.usersRepository.updateById(id, data);
   }
 

@@ -1,56 +1,60 @@
 /* eslint-disable max-classes-per-file */
-import { Exclude, Type, Transform } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { ValidateNested } from 'class-validator';
 import { ObjectId } from 'mongodb';
 import { PaginationParamsInterface } from '@interfaces/pagination-params.interface';
-import { RolesEnum } from '@decorators/roles.decorator';
 
 class Data {
   @Transform(({ value }) => value.toString(), { toPlainOnly: true })
   _id: ObjectId = new ObjectId();
 
-  role: RolesEnum = RolesEnum.USER;
+  slug = '';
 
-  verified = false;
+  title = '';
 
-  email = '';
+  date: string = new Date().toISOString();
 
-  username?: string = 'Anon';
+  author = '';
 
-  @Exclude()
-  password = '';
+  excerpt = '';
+
+  content = '';
 }
 
-export default class UserResponseEntity {
+export default class PostResponseEntity {
   @ValidateNested({ each: true })
   @Type(() => Data)
   data?: [
     {
       _id: ObjectId;
 
-      role: string;
+      slug: string;
 
-      verified: boolean;
+      title: string;
 
-      email: string;
+      date: string;
 
-      username?: string;
+      author: string;
 
-      password: string;
+      excerpt: string;
+
+      content: string;
     },
   ] = [
     {
       _id: new ObjectId(),
 
-      role: '',
+      slug: '',
 
-      verified: true,
+      title: '',
 
-      email: '',
+      date: new Date().toISOString(),
 
-      username: 'Anon',
+      author: '',
 
-      password: '',
+      excerpt: '',
+
+      content: '',
     },
   ];
 

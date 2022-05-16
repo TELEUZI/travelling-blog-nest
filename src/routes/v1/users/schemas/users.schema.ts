@@ -14,6 +14,13 @@ export class User {
 
   @Prop({
     required: true,
+    unique: true,
+    type: String,
+  })
+  username = '';
+
+  @Prop({
+    required: true,
     type: String,
   })
   password = '';
