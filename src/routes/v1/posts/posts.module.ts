@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CommentSchema, Comment, Post, PostSchema } from '@v1/posts/schemas/posts.schema';
+import { Post, PostSchema } from '@v1/posts/schemas/posts.schema';
+import { CommentSchema, Comment } from '@v1/posts/schemas/Comment';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FilesModule } from '@v1/files/files.module';
 import { FilesService } from '@v1/files/services/files.service';

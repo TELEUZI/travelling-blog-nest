@@ -2,23 +2,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Document } from 'mongoose';
-
-@Schema()
-export class Comment {
-  @Prop({
-    required: true,
-    type: String,
-  })
-  content = '5';
-
-  @Prop({
-    required: true,
-    type: String,
-  })
-  author = '';
-}
-
-export const CommentSchema = SchemaFactory.createForClass(Comment).set('versionKey', false);
+import { CommentSchema } from './Comment';
 
 @Schema()
 export class Post {
@@ -62,7 +46,7 @@ export class Post {
 
   @Prop({
     required: false,
-    type: [Comment],
+    type: [CommentSchema],
   })
   comments = [];
 

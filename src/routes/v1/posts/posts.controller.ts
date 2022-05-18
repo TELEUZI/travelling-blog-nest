@@ -138,7 +138,7 @@ export class PostsController {
   })
   @Get(':id')
   @UseGuards(JwtAccessGuard)
-  findOne(@Param('slug') slug: string): Promise<PostModel | null> {
+  findOne(@Param('id') slug: string): Promise<PostModel | null> {
     return this.postsService.findPostBySlug(slug);
   }
 
